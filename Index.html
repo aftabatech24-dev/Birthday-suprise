@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Birthday Protocol 2026</title>
+    <style>
+        /* CSS VARIABLES & RESET */
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ffb3c1;
+            --dark: #590d22;
+            --bg: #fff0f3;
+            --glass: rgba(255, 255, 255, 0.8);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            background: linear-gradient(135deg, #fff0f3 0%, #ffb3c1 100%);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            color: var(--dark);
+        }
+
+        /* SCREEN SYSTEM */
+        .screen {
+            position: absolute;
+            width: 85%;
+            max-width: 400px;
+            padding: 30px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        .active { display: flex; }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* REUSABLE COMPONENTS */
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:hover { background: var(--dark); transform: scale(1.02); }
+        input {
+            padding: 12px;
+            width: 90%;
+            border-radius: 10px;
+            border: 2px solid var(--secondary);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        /* CAKE ANIMATION */
+        .cake-wrapper {
+            position: relative;
+            width: 200px;
+            height: 150px;
+            margin: 30px auto;
+            cursor: crosshair;
+        }
+        .cake-half {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            background: #ff85a1;
+            border: 3px solid #fff;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .left { left: 0; border-radius: 20px 0 0 20px; }
+        .right { right: 0; border-radius: 0 20px 20px 0; }
+        .candle { position: absolute; top: -20px; left: 45%; font-size: 24px; transition: opacity 0.3s; }
+        
+        .split .left { transform: translateX(-40px) rotate(-10deg); }
+        .split .right { transform: translateX(40px) rotate(10deg); }
+        .split .candle { opacity: 0; }
+
+        /* MEMORY GRID */
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .memory-item {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* WISH CARDS */
+        .card-container { display: flex; gap: 10px; }
+        .card { width: 90px; height: 120px; perspective: 1000px; cursor: pointer; }
+        .card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+        .card.flipped .card-inner { transform: rotateY(180deg); }
+        .card-front, .card-back { 
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; 
+            border-radius: 15px; display: flex; align-items: center; justify-content: center;
+        }
+        .card-front { background: white; font-size: 30px; }
+        .card-back { background: var(--primary); color: white; transform: rotateY(180deg); padding: 10px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+    <div id="screen-auth" class="screen active">
+        <h2>🔒 Bestie Auth Protocol</h2>
+        <p>Confirm identity to proceed:</p>
+        <input type="text" id="auth-input" placeholder="Our favorite inside joke?">
+        <button onclick="checkAuth()">Verify Identity</button>
+        <p id="auth-error" style="color:red; font-size: 12px; display: none;">Access Denied. Try again!</p>
+    </div>
+
+    <div id="screen-hub" class="screen">
+        <h2>Welcome back! ✨</h2>
+        <div class="memory-grid">
+            <div class="memory-item" onclick="alert('Remember that time we stayed up all night?')">🍕</div>
+            <div class="memory-item" onclick="alert('The movie that made us both cry.')">🎬</div>
+            <div class="memory-item" onclick="alert('Our legendary road trip.')">🚗</div>
+            <div class="memory-item" onclick="alert('That one exam we barely passed.')">📚</div>
+            <div class="memory-item" onclick="alert('Your favorite coffee order!')">☕</div>
+            <div class="memory-item" onclick="alert('Secret Handshake!')">🤝</div>
+        </div>
+        <button onclick="next('screen-cake')">Continue to Celebration</button>
+    </div>
+
+    <div id="screen-cake" class="screen">
+        <h2>Make a Wish & Cut! 🎂</h2>
+        <div class="cake-wrapper" id="cake-area" onclick="cutCake()">
+            <div class="candle">🔥</div>
+            <div class="cake-half left"></div>
+            <div class="cake-half right"></div>
+        </div>
+        <p id="cake-msg">Tap the cake to cut it</p>
+        <button id="cake-btn" style="display:none;" onclick="next('screen-wishes')">Wishes are ready</button>
+    </div>
+
+    <div id="screen-wishes" class="screen">
+        <h2>Flip your wishes</h2>
+        <div class="card-container">
+            <div class="card" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner">
+                    <div class="card-front">🎁</div>
+                    <div class="card-back">Infinity Happiness</div>
+                </div>
+            </div>
+            <div class="card" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner">
+                    <div class="card-front">🌟</div>
+                    <div class="card-back">Dream Career</div>
+                </div>
+            </div>
+            <div class="card" onclick="this.classList.toggle('flipped')">
+                <div class="card-inner">
+                    <div class="card-front">💖</div>
+                    <div class="card-back">Self Love</div>
+                </div>
+            </div>
+        </div>
+        <button onclick="next('screen-letter')">The Final Surprise</button>
+    </div>
+
+    <div id="screen-letter" class="screen">
+        <h2>Happy Birthday! 🎈</h2>
+        <div style="text-align: left; line-height: 1.5; height: 250px; overflow-y: auto; padding: 10px;">
+            <p>Hey Bestie,</p>
+            <p>I wanted to build something as unique as our friendship. You've always been the one to help me find the "bugs" in my life and fix them.</p>
+            <p>This year, I wish you all the logic in the world, zero runtime errors, and a heart full of happiness. You deserve the best!</p>
+            <p><strong>With love,</strong><br>Your Best Friend</p>
+        </div>
+        <button onclick="location.reload()">Restart Protocol</button>
+    </div>
+
+    <script>
+        // NAVIGATION LOGIC
+        function next(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // AUTHENTICATION LOGIC
+        function checkAuth() {
+            const val = document.getElementById('auth-input').value.toLowerCase();
+            // Replace 'pizza' with your actual inside joke
+            if(val === 'pizza' || val === 'test') { 
+                next('screen-hub');
+            } else {
+                document.getElementById('auth-error').style.display = 'block';
+            }
+        }
+
+        // CAKE LOGIC
+        function cutCake() {
+            const cakeArea = document.getElementById('cake-area');
+            cakeArea.classList.add('split');
+            document.getElementById('cake-msg').innerText = "Cake Cut! 🍰";
+            document.getElementById('cake-btn').style.display = "block";
+            // Confetti effect could be added here
+        }
+
+        // CONSOLE EASTER EGG
+        console.log("%c BIRTHDAY PROTOCOL ACTIVATED ", "color: white; background: #ff4d6d; font-size: 20px; padding: 10px;");
+        console.log("Status: 200 OK. Wishes: Pending.");
+    </script>
+</body>
+  </html>
+              
